@@ -1,0 +1,49 @@
+name: aiviser
+description: A new Flutter project.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.0.5 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_dotenv: ^5.1.0
+  flutter_markdown: ^0.6.19
+  geolocator: ^11.1.0
+  google_generative_ai: ^0.4.1
+  google_maps_flutter: ^2.5.3
+  http: ^1.1.0
+  url_launcher: ^6.1.14
+  connectivity_plus: ^3.0.3
+  flutter_native_splash: ^2.3.0
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  cloud_firestore: ^4.14.0
+  shared_preferences: ^2.0.15
+  intl_phone_number_input: ^0.7.2
+  flutter_localizations:
+    sdk: flutter
+  contacts_service: ^0.6.3
+  permission_handler: ^11.3.1
+  firebase_storage: ^11.7.7
+  image_picker: ^1.1.2
+  firebase_messaging: ^14.9.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - .env
+    - assets/
+
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: fonts/Montserrat-Light.ttf
