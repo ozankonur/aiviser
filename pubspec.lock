@@ -9,6 +9,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.35"
+  amazon_cognito_identity_dart_2:
+    dependency: "direct main"
+    description:
+      name: amazon_cognito_identity_dart_2
+      sha256: "7dba58d7cba61a9d98861d5bfc777a69aa60127e78da3778095213a7e3b1539a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.6.5"
   ansicolor:
     dependency: transitive
     description:
@@ -89,6 +97,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.12.5"
+  cloud_functions:
+    dependency: "direct main"
+    description:
+      name: cloud_functions
+      sha256: ddec68a2fbee603527c009bb20c6bd071559dfa87fda55d9d92052d1ebff5377
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.7.6"
+  cloud_functions_platform_interface:
+    dependency: transitive
+    description:
+      name: cloud_functions_platform_interface
+      sha256: "0c6fca0e64fc2d3a3834d39f99b0ee6f76d96f94bb5acf4593af891df914d175"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.5.28"
+  cloud_functions_web:
+    dependency: transitive
+    description:
+      name: cloud_functions_web
+      sha256: af536e7c7223c64250c6cc384dc553d76bbacc9b9127389df0c654887f203911
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.9.6"
   collection:
     dependency: transitive
     description:
@@ -121,6 +153,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.3"
+  convert:
+    dependency: transitive
+    description:
+      name: convert
+      sha256: "0f08b14755d163f6e2134cb58222dd25ea2a2ee8a195e53983d57c075324d592"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.1"
   cross_file:
     dependency: transitive
     description:
@@ -326,6 +366,54 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.0"
+  flutter_image_compress:
+    dependency: "direct main"
+    description:
+      name: flutter_image_compress
+      sha256: "45a3071868092a61b11044c70422b04d39d4d9f2ef536f3c5b11fb65a1e7dd90"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.0"
+  flutter_image_compress_common:
+    dependency: transitive
+    description:
+      name: flutter_image_compress_common
+      sha256: "7f79bc6c8a363063620b4e372fa86bc691e1cb28e58048cd38e030692fbd99ee"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.5"
+  flutter_image_compress_macos:
+    dependency: transitive
+    description:
+      name: flutter_image_compress_macos
+      sha256: "26df6385512e92b3789dc76b613b54b55c457a7f1532e59078b04bf189782d47"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
+  flutter_image_compress_ohos:
+    dependency: transitive
+    description:
+      name: flutter_image_compress_ohos
+      sha256: e76b92bbc830ee08f5b05962fc78a532011fcd2041f620b5400a593e96da3f51
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
+  flutter_image_compress_platform_interface:
+    dependency: transitive
+    description:
+      name: flutter_image_compress_platform_interface
+      sha256: "579cb3947fd4309103afe6442a01ca01e1e6f93dc53bb4cbd090e8ce34a41889"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.5"
+  flutter_image_compress_web:
+    dependency: transitive
+    description:
+      name: flutter_image_compress_web
+      sha256: f02fe352b17f82b72f481de45add240db062a2585850bea1667e82cc4cd6c311
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.4+1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -494,7 +582,7 @@ packages:
     source: hosted
     version: "1.1.0"
   http_parser:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http_parser
       sha256: "2aa08ce0341cc9b354a498388e30986515406668dbcc4f7c950c3e715496693b"
@@ -694,13 +782,13 @@ packages:
     source: hosted
     version: "1.12.0"
   mime:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: mime
-      sha256: "2e123074287cc9fd6c09de8336dae606d1ddb88d9ac47358826db698c176a1f2"
+      sha256: "801fd0b26f14a4a58ccb09d5892c3fbdeff209594300a542492cf13fba9d247a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.5"
+    version: "1.0.6"
   nm:
     dependency: transitive
     description:
@@ -717,6 +805,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.0"
+  path_provider:
+    dependency: "direct main"
+    description:
+      name: path_provider
+      sha256: fec0d61223fba3154d87759e3cc27fe2c8dc498f6386c6d6fc80d1afdd1bf378
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.4"
+  path_provider_android:
+    dependency: transitive
+    description:
+      name: path_provider_android
+      sha256: "6f01f8e37ec30b07bc424b4deabac37cacb1bc7e2e515ad74486039918a37eb7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.10"
+  path_provider_foundation:
+    dependency: transitive
+    description:
+      name: path_provider_foundation
+      sha256: f234384a3fdd67f989b4d54a5d73ca2a6c422fa55ae694381ae0f4375cd1ea16
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.0"
   path_provider_linux:
     dependency: transitive
     description:
@@ -885,6 +997,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.1"
+  shimmer:
+    dependency: "direct main"
+    description:
+      name: shimmer
+      sha256: "1f1009b5845a1f88f1c5630212279540486f97409e9fc3f63883e71070d107bf"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   sky_engine:
     dependency: transitive
     description: flutter

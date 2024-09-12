@@ -3,6 +3,7 @@ import 'package:aiviser/services/user_service.dart';
 import 'package:aiviser/services/invitation_service.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:aiviser/screens/profile_screen.dart';
 
 class InviteContactsScreen extends StatefulWidget {
   final Map<String, dynamic> place;
@@ -24,14 +25,16 @@ class _InviteContactsScreenState extends State<InviteContactsScreen> {
   final UserService _userService = UserService();
   final InvitationService _invitationService = InvitationService();
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, dynamic>> _searchResults = [];
-  bool _isLoading = false;
+  List<Map<String, dynamic>> _followers = [];
+  List<Map<String, dynamic>> _filteredFollowers = [];
+  bool _isLoading = true;
   DateTime? _eventTime;
 
   @override
   void initState() {
     super.initState();
     _loadEventTime();
+    _loadFollowers();
   }
 
   void _loadEventTime() async {
@@ -47,28 +50,16 @@ class _InviteContactsScreenState extends State<InviteContactsScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _searchUsers(String query) async {
-    if (query.isEmpty) {
-      setState(() {
-        _searchResults = [];
-      });
-      return;
-    }
-
+  Future<void> _loadFollowers() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      List<Map<String, dynamic>> results = await _userService.searchUsersByName(query, widget.place['place_id']);
+      List<Map<String, dynamic>> followers = await _userService.getUserFollowers();
       setState(() {
-        _searchResults = results;
+        _followers = followers;
+        _filteredFollowers = followers;
         _isLoading = false;
       });
     } catch (e) {
@@ -76,45 +67,47 @@ class _InviteContactsScreenState extends State<InviteContactsScreen> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error searching users: ${e.toString()}')),
+        SnackBar(content: Text('Error loading followers: ${e.toString()}')),
       );
     }
   }
 
-  Future<void> _inviteUser(String userId) async {
+  void _filterFollowers(String query) {
+    setState(() {
+      _filteredFollowers = _followers
+          .where((follower) =>
+              follower['username'].toLowerCase().contains(query.toLowerCase()) ||
+              follower['email'].toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
+  Future<void> _inviteFollower(String followerId) async {
     try {
       if (widget.eventId != null) {
-        // Add user to existing event
-        await _invitationService.addParticipantToEvent(widget.eventId!, userId);
+        await _invitationService.addParticipantToEvent(widget.eventId!, followerId);
       } else {
-        // Create new event
         await _invitationService.createOrUpdateEvent(
           widget.place['place_id'],
           widget.place,
           _eventTime!,
-          [userId],
+          [followerId],
         );
       }
       setState(() {
-        _searchResults = _searchResults.map((user) {
-          if (user['id'] == userId) {
-            user['isInvited'] = true;
+        _filteredFollowers = _filteredFollowers.map((follower) {
+          if (follower['id'] == followerId) {
+            follower['isInvited'] = true;
           }
-          return user;
+          return follower;
         }).toList();
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invitation sent successfully'),
-          behavior: SnackBarBehavior.floating,
-        ),
+        const SnackBar(content: Text('Invitation sent successfully')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error sending invitation: ${e.toString()}'),
-          behavior: SnackBarBehavior.floating,
-        ),
+        SnackBar(content: Text('Error sending invitation: ${e.toString()}')),
       );
     }
   }
@@ -123,7 +116,7 @@ class _InviteContactsScreenState extends State<InviteContactsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Invite Users'),
+        title: const Text('Invite'),
         elevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: Theme.of(context).colorScheme.onSurface,
@@ -132,7 +125,7 @@ class _InviteContactsScreenState extends State<InviteContactsScreen> {
         children: [
           if (_eventTime != null)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+              padding: const EdgeInsets.all(16.0),
               child: Text(
                 'Event Time: ${DateFormat('MMM d, y \'at\' h:mm a').format(_eventTime!)}',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -142,82 +135,59 @@ class _InviteContactsScreenState extends State<InviteContactsScreen> {
               ),
             ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search users',
-                  prefixIcon: const Icon(Icons.search, size: 20),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Theme.of(context).colorScheme.surface,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search followers',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
                 ),
-                onChanged: _searchUsers,
+                filled: true,
+                fillColor: Colors.grey[200],
               ),
+              onChanged: _filterFollowers,
             ),
           ),
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : ListView.separated(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _searchResults.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                : ListView.builder(
+                    itemCount: _filteredFollowers.length,
                     itemBuilder: (context, index) {
-                      final user = _searchResults[index];
-                      return Card(
-                        elevation: 0,
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                      final follower = _filteredFollowers[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              follower['profileImageUrl'] != null ? NetworkImage(follower['profileImageUrl']) : null,
+                          child:
+                              follower['profileImageUrl'] == null ? Text(follower['username'][0].toUpperCase()) : null,
                         ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          leading: CircleAvatar(
-                            backgroundImage:
-                                user['profileImageUrl'] != null ? NetworkImage(user['profileImageUrl']) : null,
-                            child: user['profileImageUrl'] == null ? Text(user['username'][0].toUpperCase()) : null,
+                        title: Text(follower['username']),
+                        subtitle: Text(follower['email']),
+                        trailing: ElevatedButton(
+                          onPressed: follower['isInvited'] ? null : () => _inviteFollower(follower['id']),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: follower['isInvited'] ? Colors.grey : Theme.of(context).primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                           ),
-                          title: Text(
-                            user['username'],
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          subtitle: Text(
-                            user['email'],
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          trailing: user['isInvited']
-                              ? Chip(
-                                  label: const Text('Invited'),
-                                  backgroundColor: Colors.grey.withOpacity(0.2),
-                                  labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSecondaryContainer),
-                                )
-                              : ElevatedButton(
-                                  onPressed: () => _inviteUser(user['id']),
-                                  style: ElevatedButton.styleFrom(
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                  child: const Text('Invite'),
-                                ),
+                          child: Text(follower['isInvited'] ? 'Invited' : 'Invite', style: const TextStyle(color: Colors.white)),
                         ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileScreen(
+                                isCurrentUser: false,
+                                userId: follower['id'],
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                   ),

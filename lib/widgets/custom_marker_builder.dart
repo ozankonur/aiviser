@@ -87,7 +87,7 @@ class CustomMarkerBuilder {
         return Icons.theaters;
       case 'gas_station':
         return Icons.local_gas_station;
-      case 'invitation':
+      case 'event':
         return Icons.groups;
       default:
         return Icons.place;

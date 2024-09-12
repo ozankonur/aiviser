@@ -1,3 +1,4 @@
+import 'package:aiviser/screens/home_screen.dart';
 import 'package:aiviser/screens/map_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -118,7 +119,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               if (user == null) {
                 return const SignInScreen();
               }
-              return const MapScreen();
+              return const HomeScreen();
             }
             return const Scaffold(
               body: Center(

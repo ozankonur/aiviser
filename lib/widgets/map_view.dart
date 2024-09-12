@@ -5,12 +5,14 @@ class MapView extends StatefulWidget {
   final LatLng? userLocation;
   final Set<Marker> markers;
   final Function(GoogleMapController) onMapCreated;
+  final Function(LatLng)? onMapTap; // Add this line
 
   const MapView({
     Key? key,
     required this.userLocation,
     required this.markers,
     required this.onMapCreated,
+    this.onMapTap, // Add this line
   }) : super(key: key);
 
   @override
@@ -30,9 +32,10 @@ class _MapViewState extends State<MapView> {
         zoom: _defaultZoom,
       ),
       myLocationEnabled: true,
-      myLocationButtonEnabled: false,
+      myLocationButtonEnabled: true,
       zoomControlsEnabled: false,
       markers: widget.markers,
+      onTap: widget.onMapTap, // Add this line
     );
   }
 

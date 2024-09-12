@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:aiviser/services/location_service.dart';
@@ -310,6 +311,7 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
               }
               _fitMarkersOnMap(shouldAdjustCamera: true);
             },
+            onMapTap: _onMapTap,
           ),
           if (_errorMessage.isNotEmpty)
             ErrorDialog(
@@ -338,6 +340,38 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  void _onMapTap(LatLng tappedPoint) async {
+    bool canCreateEvent = await _invitationService.canCreateEvent();
+    if (!canCreateEvent) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You have reached the maximum number of events for today.')),
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext bottomSheetContext) => PlaceDetailsSheet(
+        place: {
+          'name': 'Custom Location',
+          'vicinity':
+              'Lat: ${tappedPoint.latitude.toStringAsFixed(6)}, Lng: ${tappedPoint.longitude.toStringAsFixed(6)}',
+          'location': tappedPoint,
+          'place_id': 'custom_${DateTime.now().millisecondsSinceEpoch}',
+        },
+        isEventPlace: false,
+        userLocation: _userLocation,
+        showSnackBar: (String message) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message)),
+          );
+        },
       ),
     );
   }

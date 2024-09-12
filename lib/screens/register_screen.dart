@@ -89,6 +89,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             'email': _emailController.text,
             'createdAt': FieldValue.serverTimestamp(),
             'emailVerified': false,
+            'usernameLower': _usernameController.text.toLowerCase(),
           });
 
           // Send email verification

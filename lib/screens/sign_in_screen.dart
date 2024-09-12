@@ -1,3 +1,4 @@
+import 'package:aiviser/screens/home_screen.dart';
 import 'package:aiviser/screens/map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:aiviser/services/auth_service.dart';
@@ -154,7 +155,7 @@ class _SignInScreenState extends State<SignInScreen> {
           const SnackBar(content: Text('Failed to sign in. Please check your credentials.')),
         );
       } else {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const MapScreen()));
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const HomeScreen()));
       }
     }
   }

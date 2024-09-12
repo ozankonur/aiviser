@@ -293,40 +293,6 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
     );
   }
 
-  void _cancelEvent(BuildContext context) async {
-    if (widget.eventId == null) return;
-
-    final bool? confirm = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Cancel Event'),
-          content: const Text('Are you sure you want to cancel this event? This action cannot be undone.'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('No'),
-              onPressed: () => Navigator.of(context).pop(false),
-            ),
-            TextButton(
-              child: const Text('Yes, Cancel'),
-              onPressed: () => Navigator.of(context).pop(true),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (confirm != true) return;
-
-    try {
-      await FirebaseFirestore.instance.collection('events').doc(widget.eventId).delete();
-      widget.showSnackBar('Event cancelled successfully');
-      Navigator.of(context).pop();
-    } catch (e) {
-      widget.showSnackBar('Error cancelling event: $e');
-    }
-  }
-
   Widget _buildEventImages(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,16 +525,17 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
             ),
             const SizedBox(height: 16),
             if (!widget.isEventPlace) ...[
-              Row(
-                children: [
-                  const Icon(Icons.star, color: Colors.amber, size: 20),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${widget.place['rating']} (${widget.place['user_ratings_total']} reviews)',
-                    style: const TextStyle(fontSize: 16, color: Colors.black87),
-                  ),
-                ],
-              ),
+              if (widget.place['rating'] != null)
+                Row(
+                  children: [
+                    const Icon(Icons.star, color: Colors.amber, size: 20),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${widget.place['rating']} (${widget.place['user_ratings_total']} reviews)',
+                      style: const TextStyle(fontSize: 16, color: Colors.black87),
+                    ),
+                  ],
+                ),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -684,35 +651,38 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
                 stream: FirebaseFirestore.instance.collection('events').doc(widget.eventId).snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) return const CircularProgressIndicator();
+                  try {
+                    final eventData = snapshot.data!.data() as Map<String, dynamic>;
+                    final participants = List<String>.from(eventData['participants'] ?? []);
+                    final invitationStatuses = Map<String, String>.from(eventData['invitationStatuses'] ?? {});
+                    final scheduledTime = eventData['scheduledTime'] as Timestamp;
+                    final ownerId = eventData['owner'] as String;
 
-                  final eventData = snapshot.data!.data() as Map<String, dynamic>;
-                  final participants = List<String>.from(eventData['participants'] ?? []);
-                  final invitationStatuses = Map<String, String>.from(eventData['invitationStatuses'] ?? {});
-                  final scheduledTime = eventData['scheduledTime'] as Timestamp;
-                  final ownerId = eventData['owner'] as String;
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildOwnerTile(ownerId, scheduledTime),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Event Time: ${_formatDateTime(scheduledTime)}',
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Participants:',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      ...participants.where((userId) => userId != ownerId).map((userId) => _buildParticipantTile(
-                            userId,
-                            invitationStatuses[userId] ?? 'pending',
-                            scheduledTime,
-                          )),
-                    ],
-                  );
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildOwnerTile(ownerId, scheduledTime),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Event Time: ${_formatDateTime(scheduledTime)}',
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Participants:',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        ...participants.where((userId) => userId != ownerId).map((userId) => _buildParticipantTile(
+                              userId,
+                              invitationStatuses[userId] ?? 'pending',
+                              scheduledTime,
+                            )),
+                      ],
+                    );
+                  } catch (e) {
+                    return Container();
+                  }
                 },
               ),
             ],
@@ -720,9 +690,24 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
               StreamBuilder<DocumentSnapshot>(
                 stream: FirebaseFirestore.instance.collection('events').doc(widget.eventId).snapshots(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) return const SizedBox.shrink();
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                  final eventData = snapshot.data!.data() as Map<String, dynamic>;
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+
+                  if (!snapshot.hasData || !snapshot.data!.exists) {
+                    return const Center(child: Text('Event not found or has been deleted.'));
+                  }
+
+                  // Safely cast the data to Map<String, dynamic>?
+                  final eventData = snapshot.data!.data() as Map<String, dynamic>?;
+                  if (eventData == null) {
+                    return const Center(child: Text('Event data is unavailable.'));
+                  }
+
                   final currentUser = FirebaseAuth.instance.currentUser;
                   final isOwner = currentUser != null && eventData['owner'] == currentUser.uid;
 
@@ -754,5 +739,36 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
         builder: (context) => CreateEventScreen(location: widget.place['location']),
       ),
     );
+  }
+
+  Future<void> _cancelEvent(BuildContext context) async {
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Cancel Event'),
+          content: const Text('Are you sure you want to cancel this event? This action cannot be undone.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            TextButton(
+              child: const Text('Yes, Cancel'),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      try {
+        await FirebaseFirestore.instance.collection('events').doc(widget.eventId).delete();
+        widget.showSnackBar('Event cancelled successfully');
+      } catch (e) {
+        widget.showSnackBar('Error cancelling event: $e');
+      }
+    }
   }
 }
