@@ -1,15 +1,3 @@
-# Ignore google-services.json
-**/google-services.json
-**/GoogleService-Info.plist
-# Ignore API keys file
-**/res/values/keys.xml
-
-# Ignore Firebase options file
-lib/firebase_options.dart
-
-# Ignore iOS AppDelegate
-ios/Runner/AppDelegate.swift
-
 # Existing .gitignore content
 # Miscellaneous
 *.class
@@ -28,19 +16,7 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
-.env
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-# Ignore google-services.json
-**/google-services.json
-
-# Ignore Google Maps API key
-**/AndroidManifest.xml
-# Ignore iOS AppDelegate
-ios/Runner/AppDelegate.swift
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
