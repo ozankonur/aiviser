@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1074564273696",
+    "project_id": "aiviser-rokon",
+    "storage_bucket": "aiviser-rokon.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1074564273696:android:dd8984db8f66f77ea90e45",
+        "android_client_info": {
+          "package_name": "xyz.aiviser"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMybAAY3qur5nK7DZZmK6A2d_TDbv421M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
