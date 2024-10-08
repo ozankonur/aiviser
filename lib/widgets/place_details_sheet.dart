@@ -137,8 +137,7 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
 
   Future<void> _uploadImage(ImageSource source) async {
     try {
-      final XFile? pickedFile =
-          await _picker.pickImage(imageQuality: 70, source: source);
+      final XFile? pickedFile = await _picker.pickImage(imageQuality: 70, source: source);
       if (pickedFile == null) return;
 
       final File imageFile = File(pickedFile.path);
@@ -148,8 +147,7 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
         _isUploading = true;
       });
 
-      final String fileName =
-          'event_${widget.eventId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final String fileName = 'event_${widget.eventId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
       print('Uploading image with filename: $fileName');
 
       final String imageUrl = await _r2Service.uploadImage(imageFile, fileName);
@@ -175,24 +173,18 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
 
   Future<void> _checkUploadability() async {
     if (widget.eventId != null) {
-      final eventDoc = await FirebaseFirestore.instance
-          .collection('events')
-          .doc(widget.eventId)
-          .get();
+      final eventDoc = await FirebaseFirestore.instance.collection('events').doc(widget.eventId).get();
       final eventData = eventDoc.data();
 
       if (eventData != null) {
         final eventDate = (eventData['scheduledTime'] as Timestamp).toDate();
         final today = DateTime.now();
 
-        final isToday = eventDate.year == today.year &&
-            eventDate.month == today.month &&
-            eventDate.day == today.day;
+        final isToday = eventDate.year == today.year && eventDate.month == today.month && eventDate.day == today.day;
 
         bool isNearEvent = false;
         if (widget.userLocation != null) {
-          isNearEvent = await _invitationService.isUserNearEvent(
-              widget.eventId!, widget.userLocation!);
+          isNearEvent = await _invitationService.isUserNearEvent(widget.eventId!, widget.userLocation!);
         }
 
         setState(() {
@@ -204,8 +196,7 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
 
   Widget _buildUploadButton(BuildContext context) {
     return ElevatedButton.icon(
-      onPressed:
-          _canUploadImage && !_isUploading ? _showImageSourceDialog : null,
+      onPressed: _canUploadImage && !_isUploading ? _showImageSourceDialog : null,
       icon: _isUploading
           ? const SizedBox(
               width: 18,
@@ -219,9 +210,7 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
       label: Text(_isUploading ? 'Uploading...' : 'Upload'),
       style: ElevatedButton.styleFrom(
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        backgroundColor: _canUploadImage
-            ? Theme.of(context).colorScheme.primary
-            : Colors.grey,
+        backgroundColor: _canUploadImage ? Theme.of(context).colorScheme.primary : Colors.grey,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -242,21 +231,15 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             StreamBuilder<DocumentSnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('events')
-                  .doc(widget.eventId)
-                  .snapshots(),
+              stream: FirebaseFirestore.instance.collection('events').doc(widget.eventId).snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) return const SizedBox.shrink();
 
-                final eventData =
-                    snapshot.data!.data() as Map<String, dynamic>?;
-                final participants =
-                    List<String>.from(eventData?['participants'] ?? []);
+                final eventData = snapshot.data!.data() as Map<String, dynamic>?;
+                final participants = List<String>.from(eventData?['participants'] ?? []);
                 final currentUser = FirebaseAuth.instance.currentUser;
 
-                if (currentUser != null &&
-                    participants.contains(currentUser.uid)) {
+                if (currentUser != null && participants.contains(currentUser.uid)) {
                   return _buildUploadButton(context);
                 } else {
                   return const SizedBox.shrink(); // Hide the upload button
@@ -318,12 +301,8 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundImage: profileImageUrl != null
-                    ? NetworkImage(profileImageUrl)
-                    : null,
-                child: profileImageUrl == null
-                    ? Text(username.substring(0, 1).toUpperCase())
-                    : null,
+                backgroundImage: profileImageUrl != null ? NetworkImage(profileImageUrl) : null,
+                child: profileImageUrl == null ? Text(username.substring(0, 1).toUpperCase()) : null,
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -332,14 +311,12 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
                   children: [
                     Text(
                       username,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Event Organizer',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.secondary),
+                      style: TextStyle(color: Theme.of(context).colorScheme.secondary),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -360,8 +337,7 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
     );
   }
 
-  Widget _buildParticipantTile(
-      String userId, String status, Timestamp scheduledTime) {
+  Widget _buildParticipantTile(String userId, String status, Timestamp scheduledTime) {
     return FutureBuilder<DocumentSnapshot>(
       future: FirebaseFirestore.instance.collection('users').doc(userId).get(),
       builder: (context, snapshot) {
@@ -385,11 +361,8 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
 
         return ListTile(
           leading: CircleAvatar(
-            backgroundImage:
-                profileImageUrl != null ? NetworkImage(profileImageUrl) : null,
-            child: profileImageUrl == null
-                ? Text(username.substring(0, 1).toUpperCase())
-                : null,
+            backgroundImage: profileImageUrl != null ? NetworkImage(profileImageUrl) : null,
+            child: profileImageUrl == null ? Text(username.substring(0, 1).toUpperCase()) : null,
           ),
           title: Text(username),
           subtitle: Text(_formatDateTime(scheduledTime)),
@@ -418,8 +391,7 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Cancel Event'),
-          content: const Text(
-              'Are you sure you want to cancel this event? This action cannot be undone.'),
+          content: const Text('Are you sure you want to cancel this event? This action cannot be undone.'),
           actions: <Widget>[
             TextButton(
               child: const Text('No'),
@@ -437,10 +409,7 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
     if (confirm != true) return;
 
     try {
-      await FirebaseFirestore.instance
-          .collection('events')
-          .doc(widget.eventId)
-          .delete();
+      await FirebaseFirestore.instance.collection('events').doc(widget.eventId).delete();
       widget.showSnackBar('Event cancelled successfully');
       Navigator.of(context).pop();
     } catch (e) {
@@ -448,45 +417,99 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
     }
   }
 
+  Future<void> _deleteImage(EventImage image) async {
+    bool confirmDelete = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Image'),
+          content: const Text('Are you sure you want to delete this image?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete == true) {
+      try {
+        await _invitationService.deleteEventImage(widget.eventId!, image.id);
+        widget.showSnackBar('Image deleted successfully');
+      } catch (e) {
+        widget.showSnackBar('Failed to delete image: $e');
+      }
+    }
+  }
+
   Widget _buildImageThumbnail(BuildContext context, EventImage image) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: GestureDetector(
-        onTap: () => _showFullScreenImage(context, image),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.network(
-            image.imageUrl,
-            width: 100,
-            height: 120,
-            fit: BoxFit.cover,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Container(
+      child: Stack(
+        children: [
+          GestureDetector(
+            onTap: () => _showFullScreenImage(context, image),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                image.imageUrl,
                 width: 100,
                 height: 120,
-                color: Colors.grey[300],
-                child: Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    width: 100,
+                    height: 120,
+                    color: Colors.grey[300],
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  print('Error loading image: $error');
+                  return Container(
+                    width: 100,
+                    height: 120,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.error),
+                  );
+                },
+              ),
+            ),
+          ),
+          if (image.userId == FirebaseAuth.instance.currentUser?.uid)
+            Positioned(
+              top: 4,
+              right: 4,
+              child: GestureDetector(
+                onTap: () => _deleteImage(image),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                    size: 16,
                   ),
                 ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              print('Error loading image: $error');
-              return Container(
-                width: 100,
-                height: 120,
-                color: Colors.grey[300],
-                child: const Icon(Icons.error),
-              );
-            },
-          ),
-        ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -514,15 +537,13 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
                     return Center(
                       child: CircularProgressIndicator(
                         value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
+                            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
                             : null,
                       ),
                     );
                   },
                   errorBuilder: (context, error, stackTrace) {
-                    return const Center(
-                        child: Icon(Icons.error, color: Colors.white));
+                    return const Center(child: Icon(Icons.error, color: Colors.white));
                   },
                 ),
               ),
@@ -544,39 +565,28 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     FutureBuilder<DocumentSnapshot>(
-                      future: FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(image.userId)
-                          .get(),
+                      future: FirebaseFirestore.instance.collection('users').doc(image.userId).get(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
                           return const SizedBox.shrink();
                         }
                         if (snapshot.hasError || !snapshot.hasData) {
                           return const SizedBox.shrink();
                         }
-                        final userData =
-                            snapshot.data!.data() as Map<String, dynamic>;
+                        final userData = snapshot.data!.data() as Map<String, dynamic>;
                         final username = userData['username'] ?? 'Unknown User';
                         final profileImageUrl = userData['profileImageUrl'];
                         return Row(
                           children: [
                             CircleAvatar(
                               radius: 16,
-                              backgroundImage: profileImageUrl != null
-                                  ? NetworkImage(profileImageUrl)
-                                  : null,
-                              child: profileImageUrl == null
-                                  ? Text(username[0].toUpperCase())
-                                  : null,
+                              backgroundImage: profileImageUrl != null ? NetworkImage(profileImageUrl) : null,
+                              child: profileImageUrl == null ? Text(username[0].toUpperCase()) : null,
                             ),
                             const SizedBox(width: 8),
                             Text(
                               username,
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                             ),
                           ],
                         );
@@ -585,8 +595,7 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
                     const SizedBox(height: 4),
                     Text(
                       DateFormat.yMMMd().add_jm().format(image.timestamp),
-                      style: TextStyle(
-                          color: Colors.white.withOpacity(0.7), fontSize: 12),
+                      style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
                     ),
                   ],
                 ),
@@ -634,10 +643,7 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
           children: [
             Text(
               widget.place['name'],
-              style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
             ),
             const SizedBox(height: 16),
             if (!widget.isEventPlace) ...[
@@ -659,8 +665,7 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
                   Expanded(
                     child: Text(
                       '${widget.place['vicinity']}',
-                      style:
-                          const TextStyle(fontSize: 16, color: Colors.black87),
+                      style: const TextStyle(fontSize: 16, color: Colors.black87),
                     ),
                   ),
                 ],
@@ -672,34 +677,25 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
                     const Icon(Icons.access_time, color: Colors.blue, size: 20),
                     const SizedBox(width: 4),
                     Text(
-                      widget.place['opening_hours']['open_now']
-                          ? 'Open Now'
-                          : 'Closed',
+                      widget.place['opening_hours']['open_now'] ? 'Open Now' : 'Closed',
                       style: TextStyle(
                         fontSize: 16,
-                        color: widget.place['opening_hours']['open_now']
-                            ? Colors.green
-                            : Colors.red,
+                        color: widget.place['opening_hours']['open_now'] ? Colors.green : Colors.red,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
               ],
-              if (widget.place['types'] != null &&
-                  widget.place['types'].isNotEmpty) ...[
+              if (widget.place['types'] != null && widget.place['types'].isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
                   children: (widget.place['types'] as List<dynamic>)
                       .map((type) => Chip(
                             label: Text(type.toString().replaceAll('_', ' ')),
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .secondary
-                                .withOpacity(0.1),
-                            labelStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.secondary),
+                            backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                            labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
                           ))
                       .toList(),
                 ),
@@ -717,27 +713,20 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
                     icon: const Icon(Icons.directions, color: Colors.white),
-                    label: const Text('Get Directions',
-                        style: TextStyle(color: Colors.white)),
+                    label: const Text('Get Directions', style: TextStyle(color: Colors.white)),
                   ),
                 ),
                 const SizedBox(width: 8),
-                if (!widget.isEventPlace ||
-                    (widget.isEventPlace && widget.eventId != null))
+                if (!widget.isEventPlace || (widget.isEventPlace && widget.eventId != null))
                   StreamBuilder<DocumentSnapshot>(
                     stream: widget.isEventPlace
-                        ? FirebaseFirestore.instance
-                            .collection('events')
-                            .doc(widget.eventId)
-                            .snapshots()
+                        ? FirebaseFirestore.instance.collection('events').doc(widget.eventId).snapshots()
                         : null,
                     builder: (context, snapshot) {
-                      if (widget.isEventPlace &&
-                          (!snapshot.hasData || snapshot.data == null)) {
+                      if (widget.isEventPlace && (!snapshot.hasData || snapshot.data == null)) {
                         return const SizedBox.shrink();
                       }
 
@@ -745,32 +734,25 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
                       bool isOwner = false;
 
                       if (widget.isEventPlace && snapshot.data != null) {
-                        final eventData =
-                            snapshot.data!.data() as Map<String, dynamic>;
-                        isOwner = currentUser != null &&
-                            eventData['owner'] == currentUser.uid;
+                        final eventData = snapshot.data!.data() as Map<String, dynamic>;
+                        isOwner = currentUser != null && eventData['owner'] == currentUser.uid;
                       }
 
-                      if (!widget.isEventPlace ||
-                          (widget.isEventPlace && isOwner)) {
+                      if (!widget.isEventPlace || (widget.isEventPlace && isOwner)) {
                         return Expanded(
                           child: ElevatedButton.icon(
                             onPressed: () => _navigateToCreateEvent(context),
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             ),
                             icon: const Icon(Icons.people, color: Colors.white),
                             label: Text(
-                              widget.isEventPlace
-                                  ? 'Invite More'
-                                  : 'Invite Users',
+                              widget.isEventPlace ? 'Invite More' : 'Invite Users',
                               style: const TextStyle(color: Colors.white),
                             ),
                           ),
@@ -787,20 +769,13 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
               _buildEventImages(context),
               const SizedBox(height: 24),
               StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('events')
-                    .doc(widget.eventId)
-                    .snapshots(),
+                stream: FirebaseFirestore.instance.collection('events').doc(widget.eventId).snapshots(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData)
-                    return const CircularProgressIndicator();
+                  if (!snapshot.hasData) return const CircularProgressIndicator();
 
-                  final eventData =
-                      snapshot.data!.data() as Map<String, dynamic>;
-                  final participants =
-                      List<String>.from(eventData['participants'] ?? []);
-                  final invitationStatuses = Map<String, String>.from(
-                      eventData['invitationStatuses'] ?? {});
+                  final eventData = snapshot.data!.data() as Map<String, dynamic>;
+                  final participants = List<String>.from(eventData['participants'] ?? []);
+                  final invitationStatuses = Map<String, String>.from(eventData['invitationStatuses'] ?? {});
                   final scheduledTime = eventData['scheduledTime'] as Timestamp;
                   final ownerId = eventData['owner'] as String;
 
@@ -811,23 +786,19 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
                       const SizedBox(height: 16),
                       Text(
                         'Event Time: ${_formatDateTime(scheduledTime)}',
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 16),
                       const Text(
                         'Participants:',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      ...participants
-                          .where((userId) => userId != ownerId)
-                          .map((userId) => _buildParticipantTile(
-                                userId,
-                                invitationStatuses[userId] ?? 'pending',
-                                scheduledTime,
-                              )),
+                      ...participants.where((userId) => userId != ownerId).map((userId) => _buildParticipantTile(
+                            userId,
+                            invitationStatuses[userId] ?? 'pending',
+                            scheduledTime,
+                          )),
                     ],
                   );
                 },
@@ -835,18 +806,13 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
             ],
             if (widget.isEventPlace && widget.eventId != null)
               StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('events')
-                    .doc(widget.eventId)
-                    .snapshots(),
+                stream: FirebaseFirestore.instance.collection('events').doc(widget.eventId).snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) return const SizedBox.shrink();
 
-                  final eventData =
-                      snapshot.data!.data() as Map<String, dynamic>;
+                  final eventData = snapshot.data!.data() as Map<String, dynamic>;
                   final currentUser = FirebaseAuth.instance.currentUser;
-                  final isOwner = currentUser != null &&
-                      eventData['owner'] == currentUser.uid;
+                  final isOwner = currentUser != null && eventData['owner'] == currentUser.uid;
 
                   if (isOwner) {
                     return Padding(
@@ -873,8 +839,7 @@ class _PlaceDetailsSheetState extends State<PlaceDetailsSheet> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            CreateEventScreen(location: widget.place['location']),
+        builder: (context) => CreateEventScreen(location: widget.place['location']),
       ),
     );
   }

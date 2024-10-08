@@ -1,5 +1,6 @@
 import 'package:aiviser/models/event_image.dart';
 import 'package:aiviser/services/auth_service.dart';
+import 'package:aiviser/services/cloudflare_r2_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -9,7 +10,8 @@ class InvitationService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final AuthService _authService = AuthService();
-  
+  final CloudflareR2Service _r2Service = CloudflareR2Service();
+
   Future<bool> canCreateEvent() async {
     final User? currentUser = _auth.currentUser;
     if (currentUser == null) {
@@ -75,6 +77,40 @@ class InvitationService {
     } else {
       // Create new event
       await _firestore.collection('events').add(eventData);
+    }
+  }
+
+  Future<void> deleteEventImage(String eventId, String imageId) async {
+    final User? currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      throw Exception('User not authenticated');
+    }
+
+    try {
+      // Get the image document
+      DocumentSnapshot imageDoc = await _firestore.collection('event_images').doc(imageId).get();
+      if (!imageDoc.exists) {
+        throw Exception('Image not found');
+      }
+
+      EventImage eventImage = EventImage.fromFirestore(imageDoc);
+
+      // Check if the current user is the one who uploaded the image
+      if (eventImage.userId != currentUser.uid) {
+        throw Exception('You do not have permission to delete this image');
+      }
+
+      // Delete the image from R2
+      String fileName = eventImage.imageUrl.split('/').last;
+      await _r2Service.deleteImage(fileName);
+
+      // Delete the image document from Firestore
+      await _firestore.collection('event_images').doc(imageId).delete();
+
+      print('Image deleted successfully');
+    } catch (e) {
+      print('Error deleting event image: $e');
+      throw Exception('Failed to delete event image: $e');
     }
   }
 

@@ -33,6 +33,20 @@ class CloudflareR2Service {
     }
   }
 
+  Future<void> deleteImage(String fileName) async {
+    try {
+      final result = await functions.httpsCallable('deleteR2Object').call({'fileName': fileName});
+      if (result.data['success']) {
+        print('Image deleted successfully');
+      } else {
+        throw Exception('Failed to delete image: ${result.data['error']}');
+      }
+    } catch (e) {
+      print('Error deleting image: $e');
+      throw Exception('Failed to delete image: $e');
+    }
+  }
+
   String _getPublicUrl(String fileName) {
     return '$customDomain/$fileName';
   }

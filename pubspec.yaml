@@ -13,26 +13,26 @@ dependencies:
   flutter_markdown: ^0.6.19
   geolocator: ^11.1.0
   google_generative_ai: ^0.4.1
-  google_maps_flutter: ^2.5.3
+  google_maps_flutter: ^2.8.0
   http: ^1.1.0
-  url_launcher: ^6.1.14
+  url_launcher: ^6.3.1
   shimmer: ^2.0.0
   connectivity_plus: ^3.0.3
   flutter_native_splash: ^2.3.0
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.16.0
-  cloud_firestore: ^4.14.0
+  firebase_core: ^3.3.0
+  firebase_auth: ^5.2.0
+  cloud_firestore: ^5.3.0
   shared_preferences: ^2.0.15
   intl_phone_number_input: ^0.7.2
   flutter_localizations:
     sdk: flutter
   contacts_service: ^0.6.3
   permission_handler: ^11.3.1
-  firebase_storage: ^11.7.7
+  firebase_storage: ^12.2.0
   image_picker: ^1.1.2
-  firebase_messaging: ^14.9.4
+  firebase_messaging: ^15.1.0
   amazon_cognito_identity_dart_2: ^3.6.5
-  cloud_functions: ^4.7.6
+  cloud_functions: ^5.1.0
   http_parser: ^4.0.2
   mime: ^1.0.6
   flutter_image_compress: ^2.3.0
